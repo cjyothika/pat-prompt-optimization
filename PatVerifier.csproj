@@ -1,0 +1,26 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <RootNamespace>PatVerifier</RootNamespace>
+    <AssemblyName>PatVerifier</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="PAT.Common">
+      <HintPath>C:\Program Files (x86)\Process Analysis Toolkit\Process Analysis Toolkit 3.5.1\PAT.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="PAT.Module.CSP">
+      <HintPath>C:\Program Files (x86)\Process Analysis Toolkit\Process Analysis Toolkit 3.5.1\Modules\CSP\PAT.Module.CSP.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+  </ItemGroup>
+</Project>

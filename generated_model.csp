@@ -1,0 +1,46 @@
+// ===== Constant Definitions =====
+#define N 10; // Number of players in the tournament
+#define READY 1; // Player is ready to compete
+#define NOT_READY 0; // Player is not ready to compete
+#define WIN 1; // Player won the game
+#define LOSE 0; // Player lost the game
+#define IN_GAME 2; // Player is in game
+#define POOL_SIZE N; // Size of the pool of players
+#define GAME_OVER N-1; // Number of games to be played before the tournament ends
+
+// ===== Variable Definitions =====
+var PlayerStatus[N] = {NOT_READY}; // Array to store the status of each player
+var GameStatus = GAME_OVER; // Variable to store the status of the game
+var Pool[POOL_SIZE] = {0}; // Array to store the pool of players
+channel readyPlayers 0; // Channel for players to signal they are ready
+channel gameResults[N] 1; // Channel array for players to report their game results
+channel gamePairings[N] 1; // Channel array for pairing players for a game
+
+// ===== Process Definitions =====
+// ===== Process Definitions =====
+
+// Player process
+Player(i) = readyPlayers!i -> PlayerStatus[i] = READY -> PlayerReady(i);
+PlayerReady(i) = gamePairings?j -> (i != j) -> PlayerStatus[i] = IN_GAME -> Game(i, j) [] readyPlayers!i -> PlayerReady(i);
+Game(i, j) = gameResults!i -> PlayerStatus[i] = WIN -> Player(i) [] gameResults!j -> PlayerStatus[i] = LOSE -> Stop;
+
+// Game pairing process
+Pairing = readyPlayers?i -> Pool[0] = i -> PoolShift -> Pairing;
+PoolShift = if (Pool[1] != 0) {gamePairings!Pool[0] -> gamePairings!Pool[1] -> Pool[0] = Pool[1] -> Pool[1] = 0 -> Skip} else {Skip};
+
+// Main process
+Main = (||| x:{0..N-1} @ Player(x)) ||| Pairing;
+
+// ===== Assertion Definitions =====
+// ===== Assertion Definitions =====
+#define allPlayersReady (forall i:{0..N-1} @ PlayerStatus[i] == READY || PlayerStatus[i] == IN_GAME || PlayerStatus[i] == WIN);
+#define allGamesPlayed GameStatus == 0;
+#define noDeadlock (exists i:{0..N-1} @ PlayerStatus[i] == READY || PlayerStatus[i] == IN_GAME);
+#define noDivergence (forall i:{0..N-1} @ PlayerStatus[i] != NOT_READY);
+#define tournamentEnds (exists i:{0..N-1} @ PlayerStatus[i] == WIN && GameStatus == 0);
+
+#assert Main |=[] allPlayersReady; // All players are either ready, in game or have won at all states in the Main process
+#assert Main |=<> allGamesPlayed; // All games are played in some state along the chosen execution path of Main
+#assert Main deadlockfree; // Main process is deadlock free
+#assert Main divergencefree; // Main process is divergence free
+#assert Main reaches tournamentEnds; // Tournament ends in some state along the chosen execution path of Main

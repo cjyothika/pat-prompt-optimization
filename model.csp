@@ -1,0 +1,10 @@
+#define xgreaterthan2 x > 2;
+var x = 0;
+Timer(i) = 
+    [i < 3]tick -> Timer(i + 1)
+    []
+    [i == 3]reset -> Timer(0);
+
+System = Timer(0);
+#assert System deadlockfree;
+#assert System |= xgreaterthan2;

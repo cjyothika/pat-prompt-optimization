@@ -1,0 +1,6 @@
+digraph G {
+"1$7" -> "1$8" [label="tick"];
+"1$8" -> "1$14" [label="tick"];
+"1$14" -> "1$19" [label="tick"];
+"1$19" -> "1$7" [label="reset"];
+}

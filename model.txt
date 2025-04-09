@@ -1,0 +1,13 @@
+// Define the maximum count before resetting
+#define MAX 5
+
+// Variable to store the current count
+int count = 0;
+
+// Define condition for reset
+#define REACHED_MAX (count == MAX)
+
+// Timer process: increments count until MAX, then resets
+process Timer = 
+    !REACHED_MAX -> {tick} -> count = count + 1; Timer
+    ▯ REACHED_MAX -> {reset} -> count = 0; Timer;
